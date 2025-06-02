@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  password  String?
+  theme     String   @default("cyberpunk")
+  createdAt DateTime @default(now())
+  accounts  Account[]
+  sessions  Session[]
+}
+
+model Account {
+  id                 String  @id @default(uuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  user               User    @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Anime {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  posterUrl   String
+  genres      String[]
+  tags        String[]
+  rating      Float    @default(0)
+  type        String   // "anime" | "manga" | "manhwa"
+  createdAt   DateTime @default(now())
+  episodes    Episode[]
+}
+
+model Episode {
+  id        String   @id @default(uuid())
+  animeId   String
+  title     String
+  videoUrl  String
+  number    Int
+  createdAt DateTime @default(now())
+  Anime     Anime    @relation(fields: [animeId], references: [id])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  imageUrl    String
+  price       Int
+  stripePriceId String
+  createdAt   DateTime @default(now())
+}
